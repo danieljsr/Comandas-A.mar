@@ -178,6 +178,7 @@
                         <select id="categoriaInput" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
                             <option value="Short film">Short film</option>
                             <option value="Highlight">Highlight</option>
+                            <option value="Editorial">Editorial</option>
                             <option value="Signature film">Signature film</option>
                             <option value="Disponible">Disponible</option>
                             <option value="Otro">Otro</option>
@@ -219,15 +220,18 @@
         let isAdmin = false;
         let comandas = [];
 
-        // DATOS EXACTOS DE LA IMAGEN DE REFERENCIA
+        // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
+        const DATA_VERSION = "2026-10-26-1";
+
+        // COMANDAS PUBLICADAS
         const defaultComandas = [
             {
                 id: "cmd-1",
                 editor: "Carlos",
                 proyecto: "Adiela & Jon",
-                categoria: "Short film",
-                duracion: "5-7 min",
-                estado: "Aprobado. Pendiente editorial de 30 a 45 segundos"
+                categoria: "Editorial",
+                duracion: "30-45 seg",
+                estado: "Editando el editorial"
             },
             {
                 id: "cmd-2",
@@ -235,7 +239,7 @@
                 proyecto: "Essie & Jeremy",
                 categoria: "Highlight",
                 duracion: "2-3 min",
-                estado: "Aprobado. Pasa a color; por definir si lo colorea Carlos y Joel arranca otra cosa, o lo colorea Joel"
+                estado: "Coloreando. Al terminar comienza el editorial de la misma boda"
             },
             {
                 id: "cmd-3",
@@ -251,7 +255,7 @@
                 proyecto: "Samantha & Josh",
                 categoria: "Signature film",
                 duracion: "12-15 min",
-                estado: "Entrega primer corte el lunes 26"
+                estado: "Entrega primer corte hoy (lunes 26)"
             },
             {
                 id: "cmd-5",
@@ -259,7 +263,7 @@
                 proyecto: "Tania & Juan Antonio",
                 categoria: "Signature film",
                 duracion: "12-15 min",
-                estado: "En correcciones"
+                estado: "Entrega correcciones hoy (lunes 26)"
             },
             {
                 id: "cmd-6",
@@ -267,7 +271,7 @@
                 proyecto: "Samantha & Josh",
                 categoria: "Highlight",
                 duracion: "2-3 min",
-                estado: "En edición"
+                estado: "Termina hoy (lunes 26)"
             },
             {
                 id: "cmd-7",
@@ -291,7 +295,7 @@
                 proyecto: "Essie & Jeremy",
                 categoria: "Signature film",
                 duracion: "12-15 min",
-                estado: "Ya conectó el material. Pendiente enviarle los documentales de referencia"
+                estado: "En edición"
             }
         ];
 
@@ -303,7 +307,8 @@
 
         function loadComandas() {
             const saved = localStorage.getItem('amar_comandas_exact');
-            if (saved) {
+            const savedVersion = localStorage.getItem('amar_comandas_version');
+            if (saved && savedVersion === DATA_VERSION) {
                 try {
                     comandas = JSON.parse(saved);
                 } catch(e) {
@@ -317,6 +322,7 @@
 
         function saveComandasStorage() {
             localStorage.setItem('amar_comandas_exact', JSON.stringify(comandas));
+            localStorage.setItem('amar_comandas_version', DATA_VERSION);
         }
 
         // RENDERIZADO exacto de las tarjetas
