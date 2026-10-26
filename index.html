@@ -283,15 +283,15 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-10-26-2";
-        const UPDATED_AT = "2026-10-26T17:30:00-04:00";
+        const DATA_VERSION = "2026-10-26-3";
+        const UPDATED_AT = "2026-10-26T19:42:00-04:00";
         const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
         // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
         const defaultComandas = [
             { id: "cmd-4", editor: "Javi", proyecto: "Samantha & Josh", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-26", etapa: 0, espera: "", estado: "Entrega primer corte hoy", despues: "" },
             { id: "cmd-5", editor: "Daniel", proyecto: "Tania & Juan Antonio", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-26", etapa: 2, espera: "", estado: "Entrega correcciones hoy", despues: "" },
-            { id: "cmd-6", editor: "Machin", proyecto: "Samantha & Josh", categoria: "Highlight", duracion: "2-3 min", entrega: "2026-10-26", etapa: 4, espera: "", estado: "En revisión final. Termina hoy", despues: "" },
+            { id: "cmd-6", editor: "Machin", proyecto: "Samantha & Josh", categoria: "Highlight", duracion: "2-3 min", entrega: "2026-10-26", etapa: 5, espera: "", disponible: true, estado: "Entregado. Disponible para editar", despues: "" },
             { id: "cmd-9", editor: "Gilberto", proyecto: "Essie & Jeremy", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-29", etapa: 0, espera: "", estado: "En edición. Entrega corte el jueves", despues: "" },
             { id: "cmd-2", editor: "Joel", proyecto: "Essie & Jeremy", categoria: "Highlight", duracion: "2-3 min", entrega: "", etapa: 3, espera: "", estado: "Coloreando. Al terminar comienza el editorial de la misma boda", despues: "Editorial Essie & Jeremy" },
             { id: "cmd-1", editor: "Carlos", proyecto: "Adiela & Jon", categoria: "Editorial", duracion: "30-45 seg", entrega: "", etapa: 0, espera: "", estado: "Editando el editorial", despues: "" },
@@ -365,9 +365,9 @@
             const upd = new Date(localStorage.getItem('amar_comandas_updated') || UPDATED_AT);
             document.getElementById('updatedAt').textContent = upd.toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
-            const libres = comandas.filter(c => c.categoria === 'Disponible');
+            const libres = comandas.filter(c => c.categoria === 'Disponible' || c.disponible);
             const activas = comandas.filter(c => c.categoria !== 'Disponible')
-                .sort((a, b) => (parseDate(a.entrega)?.getTime() ?? Infinity) - (parseDate(b.entrega)?.getTime() ?? Infinity));
+                .sort((a, b) => ((a.etapa == 5) - (b.etapa == 5)) || ((parseDate(a.entrega)?.getTime() ?? Infinity) - (parseDate(b.entrega)?.getTime() ?? Infinity)));
 
             document.getElementById('freeRow').classList.toggle('hidden', libres.length === 0);
             document.getElementById('freeNames').innerHTML = libres.map(c =>
@@ -377,7 +377,7 @@
             ).join('');
 
             const counts = { red: 0, amber: 0, green: 0, gray: 0 };
-            activas.forEach(c => counts[toneOf(c)]++);
+            activas.filter(c => c.etapa != 5).forEach(c => counts[toneOf(c)]++);
             document.getElementById('summary').innerHTML =
                 `<span class="chip t-red">${counts.red} para hoy o atrasadas</span>` +
                 `<span class="chip t-amber">${counts.amber} esta semana</span>` +
@@ -411,7 +411,7 @@
                     </div>
 
                     <div class="due">
-                        <span class="due-date">Entrega: ${fmtDate(cmd.entrega)}</span>
+                        <span class="due-date">${cmd.etapa == 5 ? 'Entregó' : 'Entrega'}: ${fmtDate(cmd.entrega)}</span>
                         <span class="count t-${tone}">${escapeHtml(countLabel(cmd))}</span>
                     </div>
 
@@ -542,7 +542,8 @@
                 entrega: document.getElementById('entregaInput').value,
                 etapa: Number(document.getElementById('etapaInput').value),
                 espera: document.getElementById('esperaInput').value.trim(),
-                despues: document.getElementById('despuesInput').value.trim()
+                despues: document.getElementById('despuesInput').value.trim(),
+                disponible: Number(document.getElementById('etapaInput').value) === 5
             };
 
             if (id) {
