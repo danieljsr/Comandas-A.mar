@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.MAR VIDEO — COMANDAS DE EDICIÓN</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #fcfbf7;
+            color: #1c1917;
+        }
+
+        /* Estilo exacto de las tarjetas con borde punteado */
+        .comanda-card {
+            background-color: #ffffff;
+            border: 1.5px dashed #d6d3cb;
+            border-radius: 14px;
+            padding: 22px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .comanda-card:hover {
+            border-color: #b5b0a3;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        /* Badge/Pill beige */
+        .badge-pill {
+            background-color: #f1ebd9;
+            color: #6b5c43;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 3px 14px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* Texto de estado café/dorado */
+        .status-text {
+            color: #946800;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Divisor fino */
+        .card-divider {
+            border-top: 1px solid #eeebe3;
+            margin-top: 14px;
+            margin-bottom: 12px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1ebd9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5bead;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 sm:p-8 lg:p-12 max-w-[1500px] mx-auto">
+
+    <!-- Header Principal -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-stone-200/60">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+                A.MAR VIDEO — COMANDAS DE EDICIÓN
+            </h1>
+        </div>
+
+        <!-- Acciones Encargado y Ajustes -->
+        <div class="flex items-center gap-3 self-end md:self-auto">
+            <!-- Indicador de Modo -->
+            <div id="modeBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/70 text-stone-700">
+                <span class="w-2 h-2 rounded-full bg-stone-400"></span>
+                <span id="modeText">Solo Lectura</span>
+            </div>
+
+            <!-- Botón Agregar (Solo Admin) -->
+            <button id="addComandaBtn" onclick="openComandaModal()" class="hidden bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Nueva Comanda
+            </button>
+
+            <!-- Botón Acceso Encargado -->
+            <button id="authBtn" onclick="toggleAuthModal()" class="bg-amber-600/10 hover:bg-amber-600/20 text-amber-900 border border-amber-600/20 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-lock" id="authBtnIcon"></i>
+                <span id="authBtnText">Modo Encargado</span>
+            </button>
+
+            <!-- Dropdown Menú -->
+            <div class="relative">
+                <button onclick="toggleMenu()" class="p-2 rounded-xl bg-stone-200/60 hover:bg-stone-200 text-stone-700 transition">
+                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                </button>
+                <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-stone-200 py-1.5 z-50 text-xs text-stone-700">
+                    <button onclick="exportJSON()" class="w-full text-left px-4 py-2 hover:bg-stone-100 flex items-center gap-2">
+                        <i class="fa-solid fa-download text-amber-700"></i> Exportar Respaldos (JSON)
+                    </button>
+                    <button onclick="triggerImport()" class="w-full text-left px-4 py-2 hover:bg-stone-100 flex items-center gap-2">
+                        <i class="fa-solid fa-upload text-stone-600"></i> Importar Datos
+                    </button>
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importJSON(event)">
+                    <div class="border-t border-stone-100 my-1"></div>
+                    <button onclick="resetDataPrompt()" class="w-full text-left px-4 py-2 hover:bg-stone-100 text-rose-600 flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Restablecer Comandas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Grid de Comandas (3 Columnas Exactas como la Imagen) -->
+    <main id="comandasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
+        <!-- Renderizado dinámico -->
+    </main>
+
+    <!-- Modal PIN de Encargado -->
+    <div id="authModal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-stone-200 w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
+            <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-amber-500/10 text-amber-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-user-shield text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-stone-900">Modo Encargado</h3>
+                <p class="text-xs text-stone-500 mt-1">Ingresa tu PIN para editar comandas (Default: 1234)</p>
+            </div>
+            <form onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="pinInput" maxlength="6" placeholder="Ingresa PIN" class="w-full text-center tracking-widest text-lg font-mono bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-600">
+                    <p id="pinError" class="text-xs text-rose-600 text-center mt-2 hidden">PIN incorrecto</p>
+                </div>
+                <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold py-3 rounded-xl transition text-sm">
+                    Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Crear / Editar Comanda -->
+    <div id="comandaModal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-stone-200 w-full max-w-md rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeComandaModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 id="modalTitle" class="text-xl font-bold text-stone-900 mb-4">Editar Comanda</h3>
+            
+            <form onsubmit="saveComanda(event)" class="space-y-4">
+                <input type="hidden" id="comandaId">
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Editor *</label>
+                    <input type="text" id="editorInput" required placeholder="Ej. Carlos, Joel, Daniel..." class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Proyecto / Pareja *</label>
+                    <input type="text" id="proyectoInput" required placeholder="Ej. Adiela & Jon" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Categoría / Badge</label>
+                        <select id="categoriaInput" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                            <option value="Short film">Short film</option>
+                            <option value="Highlight">Highlight</option>
+                            <option value="Signature film">Signature film</option>
+                            <option value="Disponible">Disponible</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Duración</label>
+                        <input type="text" id="duracionInput" placeholder="Ej. 5-7 min" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Estado / Notas de Edición *</label>
+                    <textarea id="estadoInput" rows="3" required placeholder="Ej. Aprobado. Pendiente editorial..." class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm custom-scrollbar"></textarea>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" id="deleteBtn" onclick="deleteComanda()" class="hidden text-rose-600 hover:text-rose-800 text-xs font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                    <div class="flex gap-2 ml-auto">
+                        <button type="button" onclick="closeComandaModal()" class="px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 text-white px-4 py-3 rounded-xl shadow-2xl hidden flex items-center gap-3 z-50 text-xs font-medium">
+        <i class="fa-solid fa-circle-check text-amber-500"></i>
+        <span id="toastMsg">Cambios guardados</span>
+    </div>
+
+    <script>
+        // ESTADO DE LA APLICACIÓN Y PIN
+        const ADMIN_PIN = "1234";
+        let isAdmin = false;
+        let comandas = [];
+
+        // DATOS EXACTOS DE LA IMAGEN DE REFERENCIA
+        const defaultComandas = [
+            {
+                id: "cmd-1",
+                editor: "Carlos",
+                proyecto: "Adiela & Jon",
+                categoria: "Short film",
+                duracion: "5-7 min",
+                estado: "Aprobado. Pendiente editorial de 30 a 45 segundos"
+            },
+            {
+                id: "cmd-2",
+                editor: "Joel",
+                proyecto: "Essie & Jeremy",
+                categoria: "Highlight",
+                duracion: "2-3 min",
+                estado: "Aprobado. Pasa a color; por definir si lo colorea Carlos y Joel arranca otra cosa, o lo colorea Joel"
+            },
+            {
+                id: "cmd-3",
+                editor: "Andre",
+                proyecto: "Nava & Luke",
+                categoria: "Signature film",
+                duracion: "12-15 min",
+                estado: "Entregó. Pendiente darle feedback final"
+            },
+            {
+                id: "cmd-4",
+                editor: "Javi",
+                proyecto: "Samantha & Josh",
+                categoria: "Signature film",
+                duracion: "12-15 min",
+                estado: "Entrega primer corte el lunes 26"
+            },
+            {
+                id: "cmd-5",
+                editor: "Daniel",
+                proyecto: "Tania & Juan Antonio",
+                categoria: "Signature film",
+                duracion: "12-15 min",
+                estado: "En correcciones"
+            },
+            {
+                id: "cmd-6",
+                editor: "Machin",
+                proyecto: "Samantha & Josh",
+                categoria: "Highlight",
+                duracion: "2-3 min",
+                estado: "En edición"
+            },
+            {
+                id: "cmd-7",
+                editor: "Kevin",
+                proyecto: "—",
+                categoria: "Disponible",
+                duracion: "—",
+                estado: "Disponible para editar"
+            },
+            {
+                id: "cmd-8",
+                editor: "Patricio",
+                proyecto: "—",
+                categoria: "Disponible",
+                duracion: "—",
+                estado: "Disponible para editar"
+            },
+            {
+                id: "cmd-9",
+                editor: "Gilberto",
+                proyecto: "Essie & Jeremy",
+                categoria: "Signature film",
+                duracion: "12-15 min",
+                estado: "Ya conectó el material. Pendiente enviarle los documentales de referencia"
+            }
+        ];
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            loadComandas();
+            renderGrid();
+        };
+
+        function loadComandas() {
+            const saved = localStorage.getItem('amar_comandas_exact');
+            if (saved) {
+                try {
+                    comandas = JSON.parse(saved);
+                } catch(e) {
+                    comandas = [...defaultComandas];
+                }
+            } else {
+                comandas = [...defaultComandas];
+                saveComandasStorage();
+            }
+        }
+
+        function saveComandasStorage() {
+            localStorage.setItem('amar_comandas_exact', JSON.stringify(comandas));
+        }
+
+        // RENDERIZADO exacto de las tarjetas
+        function renderGrid() {
+            const grid = document.getElementById('comandasGrid');
+            grid.innerHTML = '';
+
+            comandas.forEach(cmd => {
+                const card = document.createElement('div');
+                card.className = "comanda-card flex flex-col justify-between relative group";
+                
+                card.innerHTML = `
+                    <div>
+                        <!-- Editor Name -->
+                        <div class="flex justify-between items-start mb-1">
+                            <h2 class="text-xl font-bold text-stone-900 tracking-tight">${escapeHtml(cmd.editor)}</h2>
+                            ${isAdmin ? `
+                                <button onclick="openComandaModal('${cmd.id}')" class="text-stone-400 hover:text-stone-900 p-1 opacity-80 group-hover:opacity-100 transition">
+                                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <!-- Pareja / Proyecto -->
+                        <p class="text-stone-600 text-sm font-medium mb-3">${escapeHtml(cmd.proyecto)}</p>
+
+                        <!-- Badge Pill -->
+                        <div class="mb-4">
+                            <span class="badge-pill">${escapeHtml(cmd.categoria)}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <!-- Divider Line -->
+                        <div class="card-divider"></div>
+
+                        <!-- Duración -->
+                        <p class="text-xs text-stone-500 font-medium mb-1.5">Duración: ${escapeHtml(cmd.duracion)}</p>
+
+                        <!-- Estado / Indicación -->
+                        <p class="status-text">${escapeHtml(cmd.estado)}</p>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // MODAL AUTH
+        function toggleAuthModal() {
+            if (isAdmin) {
+                isAdmin = false;
+                updateAdminUI();
+                showToast("Modo solo lectura activado");
+            } else {
+                document.getElementById('authModal').classList.remove('hidden');
+                document.getElementById('pinInput').value = '';
+                document.getElementById('pinError').classList.add('hidden');
+                document.getElementById('pinInput').focus();
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pinInput').value;
+            if (pin === ADMIN_PIN) {
+                isAdmin = true;
+                document.getElementById('authModal').classList.add('hidden');
+                updateAdminUI();
+                showToast("Modo Encargado activo");
+            } else {
+                document.getElementById('pinError').classList.remove('hidden');
+            }
+        }
+
+        function updateAdminUI() {
+            const modeBadge = document.getElementById('modeBadge');
+            const modeText = document.getElementById('modeText');
+            const authBtnText = document.getElementById('authBtnText');
+            const authBtnIcon = document.getElementById('authBtnIcon');
+            const addBtn = document.getElementById('addComandaBtn');
+
+            if (isAdmin) {
+                modeBadge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-600/10 text-amber-900 border border-amber-600/20";
+                modeText.innerText = "Encargado Activo";
+                authBtnText.innerText = "Salir de Encargado";
+                authBtnIcon.className = "fa-solid fa-lock-open";
+                addBtn.classList.remove('hidden');
+            } else {
+                modeBadge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/70 text-stone-700";
+                modeText.innerText = "Solo Lectura";
+                authBtnText.innerText = "Modo Encargado";
+                authBtnIcon.className = "fa-solid fa-lock";
+                addBtn.classList.add('hidden');
+            }
+
+            renderGrid();
+        }
+
+        // MODAL CREAR / EDITAR
+        function openComandaModal(id = null) {
+            if (!isAdmin) return;
+
+            const modal = document.getElementById('comandaModal');
+            const title = document.getElementById('modalTitle');
+            const deleteBtn = document.getElementById('deleteBtn');
+
+            if (id) {
+                const cmd = comandas.find(c => c.id === id);
+                if (!cmd) return;
+
+                title.innerText = `Editar Comanda (${cmd.editor})`;
+                document.getElementById('comandaId').value = cmd.id;
+                document.getElementById('editorInput').value = cmd.editor;
+                document.getElementById('proyectoInput').value = cmd.proyecto;
+                document.getElementById('categoriaInput').value = cmd.categoria;
+                document.getElementById('duracionInput').value = cmd.duracion;
+                document.getElementById('estadoInput').value = cmd.estado;
+                deleteBtn.classList.remove('hidden');
+            } else {
+                title.innerText = "Nueva Comanda";
+                document.getElementById('comandaId').value = '';
+                document.getElementById('editorInput').value = '';
+                document.getElementById('proyectoInput').value = '';
+                document.getElementById('categoriaInput').value = 'Signature film';
+                document.getElementById('duracionInput').value = '12-15 min';
+                document.getElementById('estadoInput').value = '';
+                deleteBtn.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeComandaModal() {
+            document.getElementById('comandaModal').classList.add('hidden');
+        }
+
+        function saveComanda(e) {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            const id = document.getElementById('comandaId').value;
+            const newCmd = {
+                id: id || `cmd-${Date.now()}`,
+                editor: document.getElementById('editorInput').value,
+                proyecto: document.getElementById('proyectoInput').value,
+                categoria: document.getElementById('categoriaInput').value,
+                duracion: document.getElementById('duracionInput').value,
+                estado: document.getElementById('estadoInput').value
+            };
+
+            if (id) {
+                const index = comandas.findIndex(c => c.id === id);
+                if (index !== -1) comandas[index] = newCmd;
+            } else {
+                comandas.push(newCmd);
+            }
+
+            saveComandasStorage();
+            renderGrid();
+            closeComandaModal();
+            showToast(id ? "Comanda actualizada" : "Nueva comanda agregada");
+        }
+
+        function deleteComanda() {
+            if (!isAdmin) return;
+            const id = document.getElementById('comandaId').value;
+            if (id && confirm("¿Deseas eliminar esta comanda?")) {
+                comandas = comandas.filter(c => c.id !== id);
+                saveComandasStorage();
+                renderGrid();
+                closeComandaModal();
+                showToast("Comanda eliminada");
+            }
+        }
+
+        // IMPORT / EXPORT & MENU
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('hidden');
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(comandas, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `comandas_amar_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+            showToast("Respaldos exportados");
+        }
+
+        function triggerImport() {
+            if (!isAdmin) {
+                alert("Activa el Modo Encargado para importar datos.");
+                return;
+            }
+            document.getElementById('importFile').click();
+        }
+
+        function importJSON(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (Array.isArray(parsed)) {
+                        comandas = parsed;
+                        saveComandasStorage();
+                        renderGrid();
+                        showToast("Comandas importadas con éxito");
+                    }
+                } catch(err) {
+                    alert("Archivo JSON no válido");
+                }
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+
+        function resetDataPrompt() {
+            if (!isAdmin) {
+                alert("Activa el Modo Encargado para restablecer datos.");
+                return;
+            }
+            if (confirm("¿Restablecer comandas a la versión original de la imagen?")) {
+                comandas = [...defaultComandas];
+                saveComandasStorage();
+                renderGrid();
+                showToast("Comandas restablecidas");
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
