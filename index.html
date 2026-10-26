@@ -58,6 +58,26 @@
             margin-bottom: 12px;
         }
 
+        /* Entregas, semáforo y etapas */
+        .due { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+        .due-date { color: #78716c; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .count { font-weight: 800; padding: 3px 10px; border-radius: 999px; font-size: 12px; white-space: nowrap; }
+        .t-red { background: #fdecdf; color: #c2410c; }
+        .t-amber { background: #fdf3d3; color: #a16207; }
+        .t-green { background: #e8f1e1; color: #3f7a3a; }
+        .t-gray { background: #eeebe3; color: #78716c; }
+        .card-red { border-color: #e9b79a !important; }
+        .stages { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .seg { height: 6px; border-radius: 3px; background: #eeebe3; }
+        .seg.done { background: #c9b98f; }
+        .seg.now { background: #946800; }
+        .stage-labels { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; font-size: 10px; color: #a8a29e; font-weight: 600; margin-top: 5px; }
+        .stage-labels span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .stage-labels span.now { color: #946800; font-weight: 800; }
+        .next-label { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #78716c; font-weight: 700; }
+        .chip { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+        .free-name { font-weight: 700; background: #e8f1e1; color: #3f7a3a; padding: 4px 12px; border-radius: 999px; font-size: 13px; }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -78,6 +98,7 @@
             <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
                 A.MAR VIDEO — COMANDAS DE EDICIÓN
             </h1>
+            <p class="text-xs text-stone-500 mt-1.5 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-700/70"></span>Actualizado <b id="updatedAt" class="text-stone-800"></b></p>
         </div>
 
         <!-- Acciones Encargado y Ajustes -->
@@ -122,9 +143,22 @@
     </header>
 
     <!-- Grid de Comandas (3 Columnas Exactas como la Imagen) -->
+    <div id="summary" class="flex flex-wrap gap-2 mb-4"></div>
+    <div id="freeRow" class="comanda-card flex flex-wrap items-center gap-2.5 mb-6" style="padding:12px 18px">
+        <span class="text-[11px] font-bold tracking-widest uppercase text-stone-500">Disponibles</span>
+        <span id="freeNames" class="flex flex-wrap gap-2"></span>
+    </div>
+
     <main id="comandasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
         <!-- Renderizado dinámico -->
     </main>
+
+    <div class="mt-7 flex flex-wrap gap-3.5 text-xs text-stone-500">
+        <span><span class="count t-red">Rojo</span> hoy o atrasada</span>
+        <span><span class="count t-amber">Ámbar</span> en 1 a 3 días</span>
+        <span><span class="count t-green">Verde</span> a tiempo</span>
+        <span><span class="count t-gray">Gris</span> sin fecha o esperando</span>
+    </div>
 
     <!-- Modal PIN de Encargado -->
     <div id="authModal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -190,6 +224,34 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Fecha de entrega</label>
+                        <input type="date" id="entregaInput" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Etapa</label>
+                        <select id="etapaInput" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                            <option value="0">Edición</option>
+                            <option value="1">Revisión</option>
+                            <option value="2">Correcciones</option>
+                            <option value="3">Color</option>
+                            <option value="4">Revisión final</option>
+                            <option value="5">Entregado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">En lugar de fecha (opcional)</label>
+                    <input type="text" id="esperaInput" placeholder="Ej. Esperando tu feedback" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Después</label>
+                    <input type="text" id="despuesInput" placeholder="Ej. Editorial E&J" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm">
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Estado / Notas de Edición *</label>
                     <textarea id="estadoInput" rows="3" required placeholder="Ej. Aprobado. Pendiente editorial..." class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-900 focus:outline-none focus:border-amber-600 text-sm custom-scrollbar"></textarea>
@@ -221,82 +283,21 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-10-26-1";
+        const DATA_VERSION = "2026-10-26-2";
+        const UPDATED_AT = "2026-10-26T17:30:00-04:00";
+        const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
-        // COMANDAS PUBLICADAS
+        // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
         const defaultComandas = [
-            {
-                id: "cmd-1",
-                editor: "Carlos",
-                proyecto: "Adiela & Jon",
-                categoria: "Editorial",
-                duracion: "30-45 seg",
-                estado: "Editando el editorial"
-            },
-            {
-                id: "cmd-2",
-                editor: "Joel",
-                proyecto: "Essie & Jeremy",
-                categoria: "Highlight",
-                duracion: "2-3 min",
-                estado: "Coloreando. Al terminar comienza el editorial de la misma boda"
-            },
-            {
-                id: "cmd-3",
-                editor: "Andre",
-                proyecto: "Nava & Luke",
-                categoria: "Signature film",
-                duracion: "12-15 min",
-                estado: "Entregó. Pendiente darle feedback final"
-            },
-            {
-                id: "cmd-4",
-                editor: "Javi",
-                proyecto: "Samantha & Josh",
-                categoria: "Signature film",
-                duracion: "12-15 min",
-                estado: "Entrega primer corte hoy (lunes 26)"
-            },
-            {
-                id: "cmd-5",
-                editor: "Daniel",
-                proyecto: "Tania & Juan Antonio",
-                categoria: "Signature film",
-                duracion: "12-15 min",
-                estado: "Entrega correcciones hoy (lunes 26)"
-            },
-            {
-                id: "cmd-6",
-                editor: "Machin",
-                proyecto: "Samantha & Josh",
-                categoria: "Highlight",
-                duracion: "2-3 min",
-                estado: "Termina hoy (lunes 26)"
-            },
-            {
-                id: "cmd-7",
-                editor: "Kevin",
-                proyecto: "—",
-                categoria: "Disponible",
-                duracion: "—",
-                estado: "Disponible para editar"
-            },
-            {
-                id: "cmd-8",
-                editor: "Patricio",
-                proyecto: "—",
-                categoria: "Disponible",
-                duracion: "—",
-                estado: "Disponible para editar"
-            },
-            {
-                id: "cmd-9",
-                editor: "Gilberto",
-                proyecto: "Essie & Jeremy",
-                categoria: "Signature film",
-                duracion: "12-15 min",
-                estado: "En edición"
-            }
+            { id: "cmd-4", editor: "Javi", proyecto: "Samantha & Josh", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-26", etapa: 0, espera: "", estado: "Entrega primer corte hoy", despues: "" },
+            { id: "cmd-5", editor: "Daniel", proyecto: "Tania & Juan Antonio", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-26", etapa: 2, espera: "", estado: "Entrega correcciones hoy", despues: "" },
+            { id: "cmd-6", editor: "Machin", proyecto: "Samantha & Josh", categoria: "Highlight", duracion: "2-3 min", entrega: "2026-10-26", etapa: 4, espera: "", estado: "En revisión final. Termina hoy", despues: "" },
+            { id: "cmd-9", editor: "Gilberto", proyecto: "Essie & Jeremy", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-29", etapa: 0, espera: "", estado: "En edición. Entrega corte el jueves", despues: "" },
+            { id: "cmd-2", editor: "Joel", proyecto: "Essie & Jeremy", categoria: "Highlight", duracion: "2-3 min", entrega: "", etapa: 3, espera: "", estado: "Coloreando. Al terminar comienza el editorial de la misma boda", despues: "Editorial Essie & Jeremy" },
+            { id: "cmd-1", editor: "Carlos", proyecto: "Adiela & Jon", categoria: "Editorial", duracion: "30-45 seg", entrega: "", etapa: 0, espera: "", estado: "Editando el editorial", despues: "" },
+            { id: "cmd-3", editor: "Andre", proyecto: "Nava & Luke", categoria: "Signature film", duracion: "12-15 min", entrega: "", etapa: 4, espera: "Esperando feedback", estado: "Entregó. Pendiente darle feedback final", despues: "" },
+            { id: "cmd-7", editor: "Kevin", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" },
+            { id: "cmd-8", editor: "Patricio", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" }
         ];
 
         // INICIALIZACIÓN
@@ -308,6 +309,7 @@
         function loadComandas() {
             const saved = localStorage.getItem('amar_comandas_exact');
             const savedVersion = localStorage.getItem('amar_comandas_version');
+            if (savedVersion !== DATA_VERSION) localStorage.removeItem('amar_comandas_updated');
             if (saved && savedVersion === DATA_VERSION) {
                 try {
                     comandas = JSON.parse(saved);
@@ -325,48 +327,105 @@
             localStorage.setItem('amar_comandas_version', DATA_VERSION);
         }
 
-        // RENDERIZADO exacto de las tarjetas
+        // FECHAS Y SEMÁFORO
+        function parseDate(str) {
+            if (!str) return null;
+            const [y, m, d] = str.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+        function daysLeft(str) {
+            const d = parseDate(str);
+            if (!d) return null;
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            return Math.round((d - today) / 86400000);
+        }
+        function toneOf(cmd) {
+            if (cmd.etapa == 5) return 'green';
+            const n = daysLeft(cmd.entrega);
+            if (cmd.espera || n === null) return 'gray';
+            return n <= 0 ? 'red' : n <= 3 ? 'amber' : 'green';
+        }
+        function countLabel(cmd) {
+            if (cmd.etapa == 5) return 'Entregado';
+            if (cmd.espera) return cmd.espera;
+            const n = daysLeft(cmd.entrega);
+            if (n === null) return 'Sin fecha';
+            if (n < 0) return `Atrasada ${-n} día${n === -1 ? '' : 's'}`;
+            if (n === 0) return 'Hoy';
+            if (n === 1) return 'Mañana';
+            return `Faltan ${n} días`;
+        }
+        function fmtDate(str) {
+            const d = parseDate(str);
+            return d ? d.toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' }) : '—';
+        }
+
+        // RENDERIZADO de las tarjetas
         function renderGrid() {
+            const upd = new Date(localStorage.getItem('amar_comandas_updated') || UPDATED_AT);
+            document.getElementById('updatedAt').textContent = upd.toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+
+            const libres = comandas.filter(c => c.categoria === 'Disponible');
+            const activas = comandas.filter(c => c.categoria !== 'Disponible')
+                .sort((a, b) => (parseDate(a.entrega)?.getTime() ?? Infinity) - (parseDate(b.entrega)?.getTime() ?? Infinity));
+
+            document.getElementById('freeRow').classList.toggle('hidden', libres.length === 0);
+            document.getElementById('freeNames').innerHTML = libres.map(c =>
+                isAdmin
+                    ? `<button onclick="openComandaModal('${c.id}')" class="free-name hover:opacity-80">${escapeHtml(c.editor)} <i class="fa-solid fa-pen text-[10px] ml-1"></i></button>`
+                    : `<span class="free-name">${escapeHtml(c.editor)}</span>`
+            ).join('');
+
+            const counts = { red: 0, amber: 0, green: 0, gray: 0 };
+            activas.forEach(c => counts[toneOf(c)]++);
+            document.getElementById('summary').innerHTML =
+                `<span class="chip t-red">${counts.red} para hoy o atrasadas</span>` +
+                `<span class="chip t-amber">${counts.amber} esta semana</span>` +
+                `<span class="chip t-green">${counts.green} a tiempo</span>` +
+                `<span class="chip t-gray">${counts.gray} sin fecha</span>`;
+
             const grid = document.getElementById('comandasGrid');
             grid.innerHTML = '';
 
-            comandas.forEach(cmd => {
+            activas.forEach(cmd => {
+                const tone = toneOf(cmd);
+                const etapa = Number(cmd.etapa) || 0;
+                const segs = STAGES.map((_, i) => `<div class="seg ${i < etapa ? 'done' : i === etapa ? 'now' : ''}"></div>`).join('');
+                const labels = STAGES.map((s, i) => `<span class="${i === etapa ? 'now' : ''}">${s}</span>`).join('');
+
                 const card = document.createElement('div');
-                card.className = "comanda-card flex flex-col justify-between relative group";
-                
+                card.className = `comanda-card flex flex-col gap-3 relative group ${tone === 'red' ? 'card-red' : ''}`;
                 card.innerHTML = `
-                    <div>
-                        <!-- Editor Name -->
-                        <div class="flex justify-between items-start mb-1">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="min-w-0">
                             <h2 class="text-xl font-bold text-stone-900 tracking-tight">${escapeHtml(cmd.editor)}</h2>
-                            ${isAdmin ? `
-                                <button onclick="openComandaModal('${cmd.id}')" class="text-stone-400 hover:text-stone-900 p-1 opacity-80 group-hover:opacity-100 transition">
-                                    <i class="fa-solid fa-pen-to-square text-sm"></i>
-                                </button>
-                            ` : ''}
+                            <p class="text-stone-600 text-sm font-medium">${escapeHtml(cmd.proyecto)}</p>
                         </div>
-
-                        <!-- Pareja / Proyecto -->
-                        <p class="text-stone-600 text-sm font-medium mb-3">${escapeHtml(cmd.proyecto)}</p>
-
-                        <!-- Badge Pill -->
-                        <div class="mb-4">
+                        <div class="flex items-center gap-1.5 shrink-0">
                             <span class="badge-pill">${escapeHtml(cmd.categoria)}</span>
+                            ${isAdmin ? `
+                                <button onclick="openComandaModal('${cmd.id}')" class="text-stone-400 hover:text-stone-900 p-1">
+                                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                </button>` : ''}
                         </div>
+                    </div>
+
+                    <div class="due">
+                        <span class="due-date">Entrega: ${fmtDate(cmd.entrega)}</span>
+                        <span class="count t-${tone}">${escapeHtml(countLabel(cmd))}</span>
                     </div>
 
                     <div>
-                        <!-- Divider Line -->
-                        <div class="card-divider"></div>
-
-                        <!-- Duración -->
-                        <p class="text-xs text-stone-500 font-medium mb-1.5">Duración: ${escapeHtml(cmd.duracion)}</p>
-
-                        <!-- Estado / Indicación -->
-                        <p class="status-text">${escapeHtml(cmd.estado)}</p>
+                        <div class="stages">${segs}</div>
+                        <div class="stage-labels">${labels}</div>
                     </div>
-                `;
 
+                    <div class="card-divider" style="margin:2px 0"></div>
+
+                    <p class="status-text">${escapeHtml(cmd.estado)}</p>
+                    ${cmd.despues ? `<p class="text-[12.5px] text-stone-600"><span class="next-label">Después</span>&nbsp; ${escapeHtml(cmd.despues)}</p>` : ''}
+                    <p class="text-xs text-stone-500 font-medium">Duración: ${escapeHtml(cmd.duracion)}</p>
+                `;
                 grid.appendChild(card);
             });
         }
@@ -441,6 +500,10 @@
                 document.getElementById('categoriaInput').value = cmd.categoria;
                 document.getElementById('duracionInput').value = cmd.duracion;
                 document.getElementById('estadoInput').value = cmd.estado;
+                document.getElementById('entregaInput').value = cmd.entrega || '';
+                document.getElementById('etapaInput').value = String(cmd.etapa || 0);
+                document.getElementById('esperaInput').value = cmd.espera || '';
+                document.getElementById('despuesInput').value = cmd.despues || '';
                 deleteBtn.classList.remove('hidden');
             } else {
                 title.innerText = "Nueva Comanda";
@@ -450,6 +513,10 @@
                 document.getElementById('categoriaInput').value = 'Signature film';
                 document.getElementById('duracionInput').value = '12-15 min';
                 document.getElementById('estadoInput').value = '';
+                document.getElementById('entregaInput').value = '';
+                document.getElementById('etapaInput').value = '0';
+                document.getElementById('esperaInput').value = '';
+                document.getElementById('despuesInput').value = '';
                 deleteBtn.classList.add('hidden');
             }
 
@@ -471,7 +538,11 @@
                 proyecto: document.getElementById('proyectoInput').value,
                 categoria: document.getElementById('categoriaInput').value,
                 duracion: document.getElementById('duracionInput').value,
-                estado: document.getElementById('estadoInput').value
+                estado: document.getElementById('estadoInput').value,
+                entrega: document.getElementById('entregaInput').value,
+                etapa: Number(document.getElementById('etapaInput').value),
+                espera: document.getElementById('esperaInput').value.trim(),
+                despues: document.getElementById('despuesInput').value.trim()
             };
 
             if (id) {
@@ -481,6 +552,7 @@
                 comandas.push(newCmd);
             }
 
+            localStorage.setItem('amar_comandas_updated', new Date().toISOString());
             saveComandasStorage();
             renderGrid();
             closeComandaModal();
