@@ -214,6 +214,7 @@
                             <option value="Highlight">Highlight</option>
                             <option value="Editorial">Editorial</option>
                             <option value="Signature film">Signature film</option>
+                            <option value="Full Speeches">Full Speeches</option>
                             <option value="Disponible">Disponible</option>
                             <option value="Otro">Otro</option>
                         </select>
@@ -283,8 +284,8 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-10-30-1";
-        const UPDATED_AT = "2026-10-30T16:35:00-04:00";
+        const DATA_VERSION = "2026-10-30-2";
+        const UPDATED_AT = "2026-10-30T17:00:00-04:00";
         const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
         // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
@@ -295,7 +296,7 @@
             { id: "cmd-9", editor: "Gilberto", proyecto: "Essie & Jeremy", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-10-29", etapa: 0, espera: "", estado: "En edición. Entrega corte el jueves", despues: "" },
             { id: "cmd-2", editor: "Joel", proyecto: "Essie & Jeremy", categoria: "Highlight", duracion: "2-3 min", entrega: "", etapa: 4, espera: "", estado: "Recibió feedback de Carlos. En últimos ajustes", despues: "Editorial Essie & Jeremy" },
             { id: "cmd-1", editor: "Carlos", proyecto: "Adiela & Jon", categoria: "Editorial", duracion: "30-45 seg", entrega: "", etapa: 0, espera: "", estado: "Editando el editorial", despues: "" },
-            { id: "cmd-3", editor: "Andre", proyecto: "Nava & Luke", categoria: "Signature film", duracion: "12-15 min", entrega: "", etapa: 5, espera: "", disponible: true, estado: "Entregado y aprobado. Disponible para otra pieza", despues: "" },
+            { id: "cmd-3", editor: "Andre", proyecto: "Nava & Luke", categoria: "Full Speeches", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Editando los Full Speeches. Signature aprobado, pendiente por entregar", despues: "" },
             { id: "cmd-7", editor: "Kevin", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" },
             { id: "cmd-8", editor: "Patricio", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" }
         ];
