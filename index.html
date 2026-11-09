@@ -302,6 +302,23 @@
             { id: "cmd-8", editor: "Patricio", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" }
         ];
 
+        // AUTO-ACTUALIZACIÓN: revisa si hay una versión publicada más nueva y recarga
+        async function checkForUpdate() {
+            try {
+                const res = await fetch(location.pathname + '?nc=' + Date.now(), { cache: 'no-store' });
+                const html = await res.text();
+                const m = html.match(/const DATA_VERSION = "([^"]+)"/);
+                if (m && m[1] !== DATA_VERSION) {
+                    const url = new URL(location.href);
+                    url.searchParams.set('v', m[1]);
+                    location.replace(url.toString());
+                }
+            } catch (e) { /* sin conexión: se reintenta luego */ }
+        }
+        checkForUpdate();
+        setInterval(checkForUpdate, 60000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(); });
+
         // INICIALIZACIÓN
         window.onload = function() {
             loadComandas();
