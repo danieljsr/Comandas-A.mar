@@ -78,6 +78,23 @@
         .chip { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
         .free-name { font-weight: 700; background: #e8f1e1; color: #3f7a3a; padding: 4px 12px; border-radius: 999px; font-size: 13px; }
 
+        /* Pizarra de pendientes */
+        .board { background: #f4f0e6; border: 1.5px solid #e4ddcc; border-radius: 16px; padding: 18px; }
+        .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+        .note { border-radius: 10px; padding: 14px 15px 12px; box-shadow: 0 2px 6px rgba(60,45,20,0.08); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        .note:nth-child(3n+1) { transform: rotate(-0.6deg); }
+        .note:nth-child(3n+2) { transform: rotate(0.5deg); }
+        .note.alta { background: #fde7dc; }
+        .note.normal { background: #fff6d6; }
+        .note.baja { background: #ebf2e3; }
+        .note.hecho { background: #f1efe9; opacity: 0.65; }
+        .note.hecho .note-title { text-decoration: line-through; }
+        .note-who { font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #6b5c43; }
+        .note-title { font-size: 14px; font-weight: 700; color: #1c1917; line-height: 1.35; }
+        .note-text { font-size: 12.5px; color: #57534e; line-height: 1.4; }
+        .note-foot { font-size: 11.5px; color: #78716c; font-weight: 600; margin-top: 2px; }
+        .aviso { background: #fff; border: 1.5px dashed #d6d3cb; border-radius: 10px; padding: 9px 14px; font-size: 12.5px; color: #57534e; margin-bottom: 14px; }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -152,6 +169,18 @@
     <main id="comandasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
         <!-- Renderizado dinámico -->
     </main>
+
+    <!-- Pizarra de pendientes generales -->
+    <section id="pizarra" class="mt-12">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+            <h2 class="text-xl font-extrabold text-stone-900 tracking-tight">Pizarra de pendientes</h2>
+            <p class="text-xs text-stone-500" id="pizarraCount"></p>
+        </div>
+        <div class="board">
+            <div id="avisos"></div>
+            <div id="boardGrid" class="board-grid"></div>
+        </div>
+    </section>
 
     <div class="mt-7 flex flex-wrap gap-3.5 text-xs text-stone-500">
         <span><span class="count t-red">Rojo</span> hoy o atrasada</span>
@@ -286,8 +315,8 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-11-26-1";
-        const UPDATED_AT = "2026-11-26T16:14:00-04:00";
+        const DATA_VERSION = "2026-11-26-2";
+        const UPDATED_AT = "2026-11-26T16:30:00-04:00";
         const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
         // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
@@ -320,10 +349,43 @@
         setInterval(checkForUpdate, 60000);
         document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(); });
 
+        // PIZARRA DE PENDIENTES (prioridad: alta | normal | baja; hecho: true para tacharlo)
+        const AVISOS = [
+            "Javi viaja el 8 de diciembre: ese día responde más lento."
+        ];
+        const PENDIENTES = [
+            { para: "Joel", titulo: "Feedback al editorial de Nora & Hamzah", texto: "Subió versión nueva el 25 nov con los ajustes de Machin.", quien: "Machin / jefes", prioridad: "alta" },
+            { para: "Daniel", titulo: "Revisar color v01 de Tania & Juan Antonio", texto: "Subido el 25 nov en Frame.io.", quien: "Jefes", prioridad: "alta" },
+            { para: "Carlos", titulo: "Notion, selección, playlist y cuestionario de Madison & Leor", texto: "Los pidió el 25 nov para arrancar el editorial. Ale le pidió alimentar la playlist.", quien: "Ale / Daniel", prioridad: "alta" },
+            { para: "Carlos", titulo: "Conformado de Adiela & Jon para exportar", texto: "Envió el XML; espera el conformado para reconectar altas.", quien: "Machin", prioridad: "normal" },
+            { para: "Andre", titulo: "Traducción sincronizada en Premiere de Inesa & Gevork", texto: "Pide secuencia con SRT. Falta traducir el speech de la mamá. Opción: pedir ayuda a los novios o un traductor.", quien: "Carlos / equipo", prioridad: "alta" },
+            { para: "Andre", titulo: "Altas de los speeches de Nava & Luke", texto: "Preguntado el 26 nov, esperando respuesta.", quien: "Daniel", prioridad: "normal" },
+            { para: "Kevin", titulo: "Confirmar material de Fernanda & Timo", texto: "Para la selección; no hay registro en su canal.", quien: "Daniel", prioridad: "normal" },
+            { para: "Javi", titulo: "Update del color principal de Samantha & Josh", texto: "Lo esperaba para el fin de semana o inicios de semana.", quien: "Daniel", prioridad: "normal" },
+            { para: "Patricio", titulo: "Planos de stock de San Miguel de Allende", texto: "Faltan para completar la selección de Ana & Barbara.", quien: "Equipo", prioridad: "normal" },
+            { para: "Equipo", titulo: "Documentos de inducción y servidor de altas", texto: "Propuesta de Machin para el año que viene. No urgente.", quien: "Machin / Daniel", prioridad: "baja" }
+        ];
+
+        function renderPizarra() {
+            const order = { alta: 0, normal: 1, baja: 2 };
+            const items = [...PENDIENTES].sort((a, b) => (!!a.hecho - !!b.hecho) || (order[a.prioridad] - order[b.prioridad]));
+            const abiertos = PENDIENTES.filter(x => !x.hecho).length;
+            document.getElementById('pizarraCount').textContent = `${abiertos} pendiente${abiertos === 1 ? '' : 's'} abierto${abiertos === 1 ? '' : 's'}`;
+            document.getElementById('avisos').innerHTML = AVISOS.map(a => `<div class="aviso">📌 ${escapeHtml(a)}</div>`).join('');
+            document.getElementById('boardGrid').innerHTML = items.map(x => `
+                <div class="note ${x.hecho ? 'hecho' : x.prioridad}">
+                    <span class="note-who">${escapeHtml(x.para)}</span>
+                    <span class="note-title">${escapeHtml(x.titulo)}</span>
+                    ${x.texto ? `<span class="note-text">${escapeHtml(x.texto)}</span>` : ''}
+                    ${x.quien ? `<span class="note-foot">Responde: ${escapeHtml(x.quien)}</span>` : ''}
+                </div>`).join('');
+        }
+
         // INICIALIZACIÓN
         window.onload = function() {
             loadComandas();
             renderGrid();
+            renderPizarra();
         };
 
         function loadComandas() {
