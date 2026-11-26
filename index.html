@@ -216,6 +216,7 @@
                             <option value="Signature film">Signature film</option>
                             <option value="Full Speeches">Full Speeches</option>
                             <option value="Master Documentary">Master Documentary</option>
+                            <option value="Selección">Selección</option>
                             <option value="Disponible">Disponible</option>
                             <option value="Otro">Otro</option>
                         </select>
@@ -285,21 +286,21 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-11-23-1";
-        const UPDATED_AT = "2026-11-23T13:10:00-04:00";
+        const DATA_VERSION = "2026-11-26-1";
+        const UPDATED_AT = "2026-11-26T16:14:00-04:00";
         const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
         // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
         const defaultComandas = [
-            { id: "cmd-4", editor: "Javi", proyecto: "Samantha & Josh", categoria: "Signature film", duracion: "12-15 min", entrega: "", etapa: 3, espera: "", estado: "Entregó los Full Speeches. Ya recibió los proxies de Sammie & Jordan", despues: "Signature Sammie & Jordan (final 18 dic)" },
-            { id: "cmd-5", editor: "Daniel", proyecto: "Tania & Juan Antonio", categoria: "Signature film", duracion: "12-15 min", entrega: "", etapa: 3, espera: "Esperando conformado", estado: "En color. Necesita de nuevo el conformado: vino con frames extra y no calza al sustituir", despues: "" },
+            { id: "cmd-4", editor: "Javi", proyecto: "Sammie & Jordan", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-12-04", etapa: 0, espera: "", estado: "En edición. Primer corte interno 4 dic · final 18 dic", despues: "" },
+            { id: "cmd-5", editor: "Daniel", proyecto: "Tania & Juan Antonio", categoria: "Signature film", duracion: "12-15 min", entrega: "", etapa: 4, espera: "Esperando revisión", estado: "Entregó el color. Pendiente revisión", despues: "" },
             { id: "cmd-6", editor: "Machin", proyecto: "Elena & Guillermo", categoria: "Highlight", duracion: "2-3 min", entrega: "", etapa: 0, espera: "", estado: "En edición del highlight. Última pieza para cerrar Elena & Guillermo", despues: "" },
-            { id: "cmd-9", editor: "Gilberto", proyecto: "Essie & Jeremy", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-11-23", etapa: 2, espera: "", estado: "En correcciones. Entrega hoy", despues: "" },
-            { id: "cmd-2", editor: "Joel", proyecto: "Nora & Hamzah", categoria: "Editorial", duracion: "45-60 seg", entrega: "", etapa: 0, espera: "", estado: "Editando el Editorial I", despues: "Highlight Nora & Hamzah (3-5 min)" },
-            { id: "cmd-1", editor: "Carlos", proyecto: "Adiela & Jon", categoria: "Editorial", duracion: "30-45 seg", entrega: "", etapa: 3, espera: "Pendiente color", estado: "Envió el conformado de color (XML) para reconectar las altas. Pendiente el color", despues: "Editorial Madison & Leor" },
+            { id: "cmd-9", editor: "Gilberto", proyecto: "Essie & Jeremy", categoria: "Signature film", duracion: "12-15 min", entrega: "2026-11-26", etapa: 2, espera: "", estado: "En correcciones. Entrega hoy jueves", despues: "" },
+            { id: "cmd-2", editor: "Joel", proyecto: "Nora & Hamzah", categoria: "Editorial", duracion: "45-60 seg", entrega: "", etapa: 2, espera: "", estado: "Editorial I en correcciones", despues: "Highlight Nora & Hamzah (3-5 min)" },
+            { id: "cmd-1", editor: "Carlos", proyecto: "Madison & Leor", categoria: "Editorial", duracion: "15-30 seg", entrega: "", etapa: 0, espera: "", estado: "En edición", despues: "" },
             { id: "cmd-3", editor: "Andre", proyecto: "Inesa & Gevork", categoria: "Master Documentary", duracion: "35-40 min", entrega: "", etapa: 0, espera: "", estado: "Editando el Master Documentary", despues: "" },
-            { id: "cmd-7", editor: "Kevin", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" },
-            { id: "cmd-8", editor: "Patricio", proyecto: "—", categoria: "Disponible", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "Disponible para editar", despues: "" }
+            { id: "cmd-7", editor: "Kevin", proyecto: "Fernanda & Timo", categoria: "Selección", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "En selección de material", despues: "" },
+            { id: "cmd-8", editor: "Patricio", proyecto: "Ana & Barbara", categoria: "Selección", duracion: "—", entrega: "", etapa: 0, espera: "", estado: "En selección de material", despues: "" }
         ];
 
         // AUTO-ACTUALIZACIÓN: revisa si hay una versión publicada más nueva y recarga
