@@ -309,8 +309,8 @@
         let comandas = [];
 
         // VERSIÓN DE DATOS: al cambiarla, todos los navegadores cargan las comandas publicadas
-        const DATA_VERSION = "2026-11-26-9";
-        const UPDATED_AT = "2026-11-26T16:30:00-04:00";
+        const DATA_VERSION = "2026-11-26-10";
+        const UPDATED_AT = "2026-11-26T16:50:00-04:00";
         const STAGES = ["Edición", "Revisión", "Correcciones", "Color", "Rev. final", "Entregado"];
 
         // COMANDAS PUBLICADAS (entrega en formato AAAA-MM-DD, vacío si no hay fecha)
@@ -345,10 +345,10 @@
 
         // PIZARRA DE PENDIENTES: checklist que Daniel dicta. { texto, para (opcional), fecha (opcional), hecho: true para tacharlo }
         const PENDIENTES = [
-            { texto: "Revisión del color v01 de Tania & Juan Antonio", para: "Daniel" },
-            { texto: "Playlist y notas de edición de Sammie & Jordan", para: "Javi" },
-            { texto: "Enviarle los clips que faltan para reconectar Sammie & Jordan", para: "Javi" },
-            { texto: "Enviarle a Andre los speeches de Nava & Luke en alta para color", para: "Carlos" }
+            { texto: "Revisión del color v01 de Tania & Juan Antonio (subido el 25 nov)", para: "Daniel · revisan los jefes" },
+            { texto: "Playlist y notas de edición de Sammie & Jordan", para: "Javi · lo pidió el 26 nov, Ale lo revisa" },
+            { texto: "Reenviarle el clip AMAR_CAM1_9506.MP4 de Sammie & Jordan (subió dañado)", para: "Javi · ruta en su canal" },
+            { texto: "Enviarle a Andre los speeches de Nava & Luke en alta para color", para: "Carlos · los pasa a más tardar el vie 27 en la noche" }
         ];
 
         function renderPizarra() {
